@@ -13,12 +13,23 @@ class CupGameScene: SKScene {
     var cups = [SKSpriteNode]()
     let ballUnderCup = SKShapeNode(circleOfRadius: 10)
     
-    override func didMove(to view: SKView) {
-        backgroundColor = .white
-        setupCups()
-        addBallUnderCup()
-        shuffleCups()
+    @Binding var isGameStarted: Bool
+    
+    init(isGameStarted: Binding<Bool>) {
+        _isGameStarted = isGameStarted
+        super.init(size: CGSize(width: 1000, height: 600))
+        self.scaleMode = .fill
+        
     }
+    
+    required init?(coder aDecoder: NSCoder) {
+        _isGameStarted = .constant(false)
+        super.init(coder: aDecoder)
+    }
+    
+}
+
+extension CupGameScene {
     
     func setupCups() {
         
@@ -49,6 +60,24 @@ class CupGameScene: SKScene {
         
         addChild(ballUnderCup)
     }
+}
+
+extension CupGameScene {
+    
+    override func didMove(to view: SKView) {
+        backgroundColor = .white
+        setupCups()
+        addBallUnderCup()
+        shuffleCups()
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+    }
+    
+}
+
+extension CupGameScene {
     
     func shuffleCups() {
         
@@ -65,8 +94,6 @@ class CupGameScene: SKScene {
         middleCup.run(middleAction)
         leftCup.run(leftAction)
         rightCup.run(rightAction)
-        
-                
     }
     
     func getMiddleCupAction(cup: SKSpriteNode) -> SKAction {
@@ -78,7 +105,7 @@ class CupGameScene: SKScene {
     }
     
     func getLeftCupAction(cup: SKSpriteNode) -> SKAction {
-
+        
         let path = CGMutablePath()
         let startPoint = CGPoint(x: cup.position.x,
                                  y: cup.position.y)
@@ -86,10 +113,10 @@ class CupGameScene: SKScene {
                                y: cup.position.y)
         
         let control1 = CGPoint(x: cup.position.x + 200,
-                              y: cup.position.y - 200)
+                               y: cup.position.y - 200)
         
         let control2 = CGPoint(x: cup.position.x + 400,
-                              y: cup.position.y)
+                               y: cup.position.y)
         
         path.move(to: startPoint)
         path.addCurve(to: endPoint, control1: control1, control2: control2)
@@ -98,15 +125,15 @@ class CupGameScene: SKScene {
         
         let path2 = CGMutablePath()
         let startPoint2 = CGPoint(x: cup.position.x + 400,
-                                 y: cup.position.y)
+                                  y: cup.position.y)
         let endPoint2 = CGPoint(x: cup.position.x,
-                               y: cup.position.y)
+                                y: cup.position.y)
         
         let control3 = CGPoint(x: cup.position.x + 200,
-                              y: cup.position.y + 200)
+                               y: cup.position.y + 200)
         
         let control4 = CGPoint(x: cup.position.x,
-                              y: cup.position.y)
+                               y: cup.position.y)
         
         path2.move(to: startPoint2)
         path2.addCurve(to: endPoint2, control1: control3, control2: control4)
@@ -127,10 +154,10 @@ class CupGameScene: SKScene {
                                y: cup.position.y)
         
         let control1 = CGPoint(x: cup.position.x - 200,
-                              y: cup.position.y - 200)
+                               y: cup.position.y - 200)
         
         let control2 = CGPoint(x: cup.position.x - 400,
-                              y: cup.position.y)
+                               y: cup.position.y)
         
         path.move(to: startPoint)
         path.addCurve(to: endPoint, control1: control1, control2: control2)
@@ -139,15 +166,15 @@ class CupGameScene: SKScene {
         
         let path2 = CGMutablePath()
         let startPoint2 = CGPoint(x: cup.position.x - 400,
-                                 y: cup.position.y)
+                                  y: cup.position.y)
         let endPoint2 = CGPoint(x: cup.position.x,
-                               y: cup.position.y)
+                                y: cup.position.y)
         
         let control3 = CGPoint(x: cup.position.x - 200,
-                              y: cup.position.y + 200)
+                               y: cup.position.y + 200)
         
         let control4 = CGPoint(x: cup.position.x,
-                              y: cup.position.y)
+                               y: cup.position.y)
         
         path2.move(to: startPoint2)
         path2.addCurve(to: endPoint2, control1: control3, control2: control4)
@@ -159,30 +186,17 @@ class CupGameScene: SKScene {
         return sequence
         
     }
-    
-    
-    //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-    //
-    //    }
-    
 }
 
 struct CupGameSpriteView: View {
     
     @State private var isGameStarted: Bool = false
     
-    var scene: SKScene {
-        let scene = CupGameScene()
-        scene.size = CGSize(width: 1000, height: 600)
-        scene.scaleMode = .fill
-        return scene
-    }
-    
     var body: some View {
         
         VStack {
             
-            SpriteView(scene: scene)
+            SpriteView(scene: CupGameScene(isGameStarted: $isGameStarted))
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
             
