@@ -52,18 +52,27 @@ class CupGameScene: SKScene {
     
     func shuffleCups() {
         
-        let moveRight = SKAction.move(by: CGVectorMake(CGFloat(200), 0), duration: 0.5)
+        guard cups.count >= 3 else { return }
         
-        let moveLeft = SKAction.move(by: CGVectorMake(CGFloat(-200), 0), duration: 0.5)
+        let leftCup = cups[0]
+        let middleCup = cups[1]
+        let rightCup = cups[2]
         
-        let wait = SKAction.wait(forDuration: 0.5)
+        // middle cup moves up and then back down
+        let moveUp = SKAction.move(by: CGVectorMake(CGFloat(0), 100), duration: 1)
+        let moveDown = SKAction.move(by: CGVectorMake(0, -100), duration: 1)
+        let middleCupSequence = SKAction.sequence([moveUp, moveDown])
         
-        let sequence = SKAction.sequence([moveRight, wait, moveLeft, wait])
-        let repeatShuffle = SKAction.repeat(sequence, count: 3)
+        // left and right cup move
+        let moveRight = SKAction.move(by: CGVectorMake(400, 0), duration: 1)
+        let moveLeft = SKAction.move(by: CGVectorMake(-400, 0), duration: 1)
         
-        for cup in cups {
-            cup.run(repeatShuffle)
-        }
+        let leftSequence = SKAction.sequence([moveRight, moveLeft])
+        let rightSequence = SKAction.sequence([moveLeft, moveRight])
+        
+        middleCup.run(middleCupSequence)
+        leftCup.run(leftSequence)
+        rightCup.run(rightSequence)
         
     }
     
