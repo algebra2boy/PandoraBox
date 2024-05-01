@@ -30,7 +30,7 @@ class CupGameScene: SKScene {
         
         for position in cupPositions {
             let cup = SKSpriteNode(imageNamed: "cup")
-            cup.size = CGSize(width: 200, height: 100)
+            cup.size = CGSize(width: 280, height: 120)
             cup.position = position
             addChild(cup)
             cups.append(cup)
@@ -41,7 +41,7 @@ class CupGameScene: SKScene {
     func addBallUnderCup() {
         let randomIndex = Int.random(in: 0 ..< cups.count)
         
-        let x = cups[randomIndex].position.x - 4
+        let x = cups[randomIndex].position.x - 5
         let y = cups[randomIndex].position.y - 45
         ballUnderCup.position = CGPoint(x: x, y: y)
         
@@ -58,23 +58,108 @@ class CupGameScene: SKScene {
         let middleCup = cups[1]
         let rightCup = cups[2]
         
-        // middle cup moves up and then back down
+        let middleAction = getMiddleCupAction(cup: middleCup)
+        let leftAction = getLeftCupAction(cup: leftCup)
+        let rightAction = getRightCupAction(cup: rightCup)
+        
+        middleCup.run(middleAction)
+        leftCup.run(leftAction)
+        rightCup.run(rightAction)
+        
+                
+    }
+    
+    func getMiddleCupAction(cup: SKSpriteNode) -> SKAction {
         let moveUp = SKAction.move(by: CGVectorMake(CGFloat(0), 100), duration: 1)
         let moveDown = SKAction.move(by: CGVectorMake(0, -100), duration: 1)
-        let middleCupSequence = SKAction.sequence([moveUp, moveDown])
+        let sequence = SKAction.sequence([moveUp, moveDown])
         
-        // left and right cup move
-        let moveRight = SKAction.move(by: CGVectorMake(400, 0), duration: 1)
-        let moveLeft = SKAction.move(by: CGVectorMake(-400, 0), duration: 1)
+        return sequence
+    }
+    
+    func getLeftCupAction(cup: SKSpriteNode) -> SKAction {
+
+        let path = CGMutablePath()
+        let startPoint = CGPoint(x: cup.position.x,
+                                 y: cup.position.y)
+        let endPoint = CGPoint(x: cup.position.x + 400,
+                               y: cup.position.y)
         
-        let leftSequence = SKAction.sequence([moveRight, moveLeft])
-        let rightSequence = SKAction.sequence([moveLeft, moveRight])
+        let control1 = CGPoint(x: cup.position.x + 200,
+                              y: cup.position.y - 200)
         
-        middleCup.run(middleCupSequence)
-        leftCup.run(leftSequence)
-        rightCup.run(rightSequence)
+        let control2 = CGPoint(x: cup.position.x + 400,
+                              y: cup.position.y)
+        
+        path.move(to: startPoint)
+        path.addCurve(to: endPoint, control1: control1, control2: control2)
+        
+        let curve = SKAction.follow(path, asOffset: false, orientToPath: false, duration: 1)
+        
+        let path2 = CGMutablePath()
+        let startPoint2 = CGPoint(x: cup.position.x + 400,
+                                 y: cup.position.y)
+        let endPoint2 = CGPoint(x: cup.position.x,
+                               y: cup.position.y)
+        
+        let control3 = CGPoint(x: cup.position.x + 200,
+                              y: cup.position.y + 200)
+        
+        let control4 = CGPoint(x: cup.position.x,
+                              y: cup.position.y)
+        
+        path2.move(to: startPoint2)
+        path2.addCurve(to: endPoint2, control1: control3, control2: control4)
+        
+        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
+        
+        let sequence = SKAction.sequence([curve, curve2])
+        
+        return sequence
         
     }
+    
+    func getRightCupAction(cup: SKSpriteNode) -> SKAction {
+        let path = CGMutablePath()
+        let startPoint = CGPoint(x: cup.position.x,
+                                 y: cup.position.y)
+        let endPoint = CGPoint(x: cup.position.x - 400,
+                               y: cup.position.y)
+        
+        let control1 = CGPoint(x: cup.position.x - 200,
+                              y: cup.position.y - 200)
+        
+        let control2 = CGPoint(x: cup.position.x - 400,
+                              y: cup.position.y)
+        
+        path.move(to: startPoint)
+        path.addCurve(to: endPoint, control1: control1, control2: control2)
+        
+        let curve = SKAction.follow(path, asOffset: false, orientToPath: false, duration: 1)
+        
+        let path2 = CGMutablePath()
+        let startPoint2 = CGPoint(x: cup.position.x - 400,
+                                 y: cup.position.y)
+        let endPoint2 = CGPoint(x: cup.position.x,
+                               y: cup.position.y)
+        
+        let control3 = CGPoint(x: cup.position.x - 200,
+                              y: cup.position.y + 200)
+        
+        let control4 = CGPoint(x: cup.position.x,
+                              y: cup.position.y)
+        
+        path2.move(to: startPoint2)
+        path2.addCurve(to: endPoint2, control1: control3, control2: control4)
+        
+        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
+        
+        let sequence = SKAction.sequence([curve, curve2])
+        
+        return sequence
+        
+    }
+    
     
     //    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     //
