@@ -11,7 +11,7 @@
 		FF68DC712BE29BFF0031FD55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC702BE29BFF0031FD55 /* ContentView.swift */; };
 		FF68DC732BE29C060031FD55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF68DC722BE29C060031FD55 /* Assets.xcassets */; };
 		FF68DC772BE29C060031FD55 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF68DC762BE29C060031FD55 /* Preview Assets.xcassets */; };
-		FF68DC7E2BE29C2E0031FD55 /* CupGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC7D2BE29C2E0031FD55 /* CupGameView.swift */; };
+		FF68DC802BE2A19C0031FD55 /* CupGameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -21,7 +21,7 @@
 		FF68DC722BE29C060031FD55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF68DC742BE29C060031FD55 /* CupGame.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CupGame.entitlements; sourceTree = "<group>"; };
 		FF68DC762BE29C060031FD55 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		FF68DC7D2BE29C2E0031FD55 /* CupGameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CupGameView.swift; path = ../../RAISEHackathonAAHS/Sources/RAISEHackathonAAHS/CupGame/CupGameView.swift; sourceTree = "<group>"; };
+		FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CupGameSpriteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -55,8 +55,8 @@
 			isa = PBXGroup;
 			children = (
 				FF68DC6E2BE29BFF0031FD55 /* CupGameApp.swift */,
-				FF68DC7D2BE29C2E0031FD55 /* CupGameView.swift */,
 				FF68DC702BE29BFF0031FD55 /* ContentView.swift */,
+				FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */,
 				FF68DC722BE29C060031FD55 /* Assets.xcassets */,
 				FF68DC742BE29C060031FD55 /* CupGame.entitlements */,
 				FF68DC752BE29C060031FD55 /* Preview Content */,
@@ -144,7 +144,7 @@
 			files = (
 				FF68DC712BE29BFF0031FD55 /* ContentView.swift in Sources */,
 				FF68DC6F2BE29BFF0031FD55 /* CupGameApp.swift in Sources */,
-				FF68DC7E2BE29C2E0031FD55 /* CupGameView.swift in Sources */,
+				FF68DC802BE2A19C0031FD55 /* CupGameSpriteView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
