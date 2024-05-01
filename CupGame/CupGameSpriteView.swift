@@ -13,17 +13,12 @@ class CupGameScene: SKScene {
     var cups = [SKSpriteNode]()
     let ballUnderCup = SKShapeNode(circleOfRadius: 10)
     
-    @Binding var isGameStarted: Bool
-    
-    init(isGameStarted: Binding<Bool>) {
-        _isGameStarted = isGameStarted
+    override init() {
         super.init(size: CGSize(width: 1000, height: 600))
         self.scaleMode = .fill
-        
     }
     
     required init?(coder aDecoder: NSCoder) {
-        _isGameStarted = .constant(false)
         super.init(coder: aDecoder)
     }
     
@@ -68,11 +63,10 @@ extension CupGameScene {
         backgroundColor = .white
         setupCups()
         addBallUnderCup()
-        shuffleCups()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
+        shuffleCups()
     }
     
 }
@@ -189,24 +183,14 @@ extension CupGameScene {
 }
 
 struct CupGameSpriteView: View {
-    
-    @State private var isGameStarted: Bool = false
-    
+        
     var body: some View {
         
         VStack {
             
-            SpriteView(scene: CupGameScene(isGameStarted: $isGameStarted))
+            SpriteView(scene: CupGameScene())
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
-            
-            Button {
-                isGameStarted.toggle()
-            } label: {
-                Text("Start game")
-            }
-            .buttonStyle(.borderedProminent)
-            
             
             Spacer()
         }
