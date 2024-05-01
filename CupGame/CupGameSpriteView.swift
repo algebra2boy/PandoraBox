@@ -11,14 +11,19 @@ import SpriteKit
 class CupGameScene: SKScene {
     
     var cups = [SKSpriteNode]()
-    let ballUnderCup = SKShapeNode(circleOfRadius: 10)
+    let ballUnderCup = SKShapeNode(circleOfRadius: 15)
     
-    override init() {
+    @Binding var isGameStarted: Bool
+    
+    
+    init(_ isGameStarted: Binding<Bool>) {
+        _isGameStarted = isGameStarted
         super.init(size: CGSize(width: 1000, height: 600))
-        self.scaleMode = .fill
+        self.scaleMode = .aspectFit
     }
     
     required init?(coder aDecoder: NSCoder) {
+        _isGameStarted = .constant(false)
         super.init(coder: aDecoder)
     }
     
@@ -47,8 +52,8 @@ extension CupGameScene {
     func addBallUnderCup() {
         let randomIndex = Int.random(in: 0 ..< cups.count)
         
-        let x = cups[randomIndex].position.x - 5
-        let y = cups[randomIndex].position.y - 45
+        let x = cups[randomIndex].position.x - 4
+        let y = cups[randomIndex].position.y - 60
         ballUnderCup.position = CGPoint(x: x, y: y)
         
         ballUnderCup.fillColor = .green
@@ -60,18 +65,36 @@ extension CupGameScene {
 extension CupGameScene {
     
     override func didMove(to view: SKView) {
-        backgroundColor = .white
-        setupCups()
-        addBallUnderCup()
+        resetGame()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-        shuffleCups()
+        if !isGameStarted {
+            print("shuffle")
+            shuffleCups()
+            isGameStarted = true
+        } else {
+//            resetGame()
+//            isGameStarted = false
+        }
     }
     
 }
 
 extension CupGameScene {
+    
+    func resetGame() {
+        
+        for cup in cups {
+            cup.removeFromParent()
+        }
+        ballUnderCup.removeFromParent()
+    
+        backgroundColor = .white
+        setupCups()
+        addBallUnderCup()
+        
+    }
     
     func shuffleCups() {
         
@@ -91,9 +114,11 @@ extension CupGameScene {
     }
     
     func getMiddleCupAction(cup: SKSpriteNode) -> SKAction {
+        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 0.5)
+        let wait = SKAction.wait(forDuration: 0.5)
         let moveUp = SKAction.move(by: CGVectorMake(CGFloat(0), 100), duration: 1)
         let moveDown = SKAction.move(by: CGVectorMake(0, -100), duration: 1)
-        let sequence = SKAction.sequence([moveUp, moveDown])
+        let sequence = SKAction.sequence([hide, wait, moveUp, moveDown])
         
         return sequence
     }
@@ -134,7 +159,11 @@ extension CupGameScene {
         
         let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
         
-        let sequence = SKAction.sequence([curve, curve2])
+        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 0.5)
+        
+        let wait = SKAction.wait(forDuration: 0.5)
+        
+        let sequence = SKAction.sequence([hide, wait, curve, curve2])
         
         return sequence
         
@@ -175,7 +204,11 @@ extension CupGameScene {
         
         let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
         
-        let sequence = SKAction.sequence([curve, curve2])
+        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 0.5)
+        
+        let wait = SKAction.wait(forDuration: 0.5)
+        
+        let sequence = SKAction.sequence([hide, wait, curve, curve2])
         
         return sequence
         
@@ -183,14 +216,20 @@ extension CupGameScene {
 }
 
 struct CupGameSpriteView: View {
+    
+    @State private var isGameStarted: Bool = false
         
     var body: some View {
         
         VStack {
             
-            SpriteView(scene: CupGameScene())
+            SpriteView(scene: CupGameScene($isGameStarted))
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
+            
+            Text(isGameStarted ? "Pick one" : "")
+                .fontWeight(.bold)
+                .font(.system(size: 50))
             
             Spacer()
         }
