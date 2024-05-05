@@ -34,7 +34,7 @@ class PandoraGameScene: SKScene {
 
 extension PandoraGameScene {
     
-    func setupBoxes() {
+    func setupBoxes(imageName: String = "boxOpen") {
         
         // the cup positions in the x and y coordinate
         let boxPositions = [
@@ -45,8 +45,8 @@ extension PandoraGameScene {
         
         // adding the cup to each position on the scene
         for position in boxPositions {
-            let box = SKSpriteNode(imageNamed: "boxOpen")
-            box.size = CGSize(width: 200, height: 150)
+            let box = SKSpriteNode(imageNamed: imageName)
+            box.size = CGSize(width: 175, height: 140)
             box.position = position
             addChild(box)
             boxes.append(box)
@@ -95,6 +95,17 @@ extension PandoraGameScene {
         
         let animationAction = createAnimationAction()
         skeleton.run(animationAction)
+    }
+    
+    func clean() {
+        for box in boxes {
+            box.removeFromParent()
+        }
+        skeleton.removeFromParent()
+        
+        boxes = []
+        skeleton = SKSpriteNode()
+        
     }
 }
 
@@ -149,19 +160,6 @@ extension PandoraGameScene {
         addSkletonAboveBox()
     }
     
-    //    func resetGameDefault() {
-    //
-    //        for box in boxes {
-    //            box.removeFromParent()
-    //        }d
-    //        skeleton.removeFromParent()
-    //
-    //        backgroundColor = .white
-    //        setupBoxes()
-    //        addSkletonAboveBox()
-    //
-    //    }
-    
     func makeSkeletonDisappear() {
         
         // create a move action
@@ -176,16 +174,20 @@ extension PandoraGameScene {
         // remove the skeleton from the scene
         let removeAction = SKAction.removeFromParent()
         
-        // combine the (move, fade) and remove
+        // combine the move, fadeout, and remove
         let actions = SKAction.sequence([groupAction, removeAction])
         
-        skeleton.run(actions)
+        skeleton.run(actions, completion: closeBoxes)
         
     }
     
-    func makeBoxClose() {
+    func closeBoxes() {
         
+        // remove the open box
+        clean()
         
+        // switch the image from open to close
+        setupBoxes(imageName: "boxClose")
         
     }
     
