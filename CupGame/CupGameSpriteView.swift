@@ -1,5 +1,5 @@
 //
-//  CupGameSpriteView.swift
+//  PandoraGameSceneSpriteView.swift
 //  CupGame
 //
 //  Created by Yongye Tan on 5/1/24.
@@ -8,186 +8,241 @@
 import SwiftUI
 import SpriteKit
 
-class CupGameScene: SKScene {
+class PandoraGameScene: SKScene {
     
-    var cups = [SKSpriteNode]()
-    let ballUnderCup = SKShapeNode(circleOfRadius: 15)
+    private var boxes: [SKSpriteNode] = []
+    private var skeleton = SKSpriteNode()
     
     @Binding var isGameStarted: Bool
     
+    @Binding var isAnimating: Bool
     
-    init(_ isGameStarted: Binding<Bool>) {
+    init(_ isGameStarted: Binding<Bool>, _ isAnimating: Binding<Bool>) {
         _isGameStarted = isGameStarted
+        _isAnimating = isAnimating
         super.init(size: CGSize(width: 1000, height: 600))
         self.scaleMode = .aspectFit
     }
     
     required init?(coder aDecoder: NSCoder) {
         _isGameStarted = .constant(false)
+        _isAnimating = .constant(false)
         super.init(coder: aDecoder)
     }
     
 }
 
-extension CupGameScene {
+extension PandoraGameScene {
     
-    func setupCups() {
+    func setupBoxes(imageName: String = "boxOpen") {
         
-        let cupPositions = [
+        // the cup positions in the x and y coordinate
+        let boxPositions = [
             CGPoint(x: 300, y: 200),
             CGPoint(x: 500, y: 200),
             CGPoint(x: 700, y: 200)
         ]
         
-        for position in cupPositions {
-            let cup = SKSpriteNode(imageNamed: "cup")
-            cup.size = CGSize(width: 280, height: 120)
-            cup.position = position
-            addChild(cup)
-            cups.append(cup)
+        // adding the cup to each position on the scene
+        for position in boxPositions {
+            let box = SKSpriteNode(imageNamed: imageName)
+            box.size = CGSize(width: 175, height: 140)
+            box.position = position
+            addChild(box)
+            boxes.append(box)
         }
         
     }
     
-    func addBallUnderCup() {
-        let randomIndex = Int.random(in: 0 ..< cups.count)
+    // load the ghost image from the assets
+    func loadSkletonTextures() -> [SKTexture] {
+        var textures: [SKTexture] = []
         
-        let x = cups[randomIndex].position.x - 4
-        let y = cups[randomIndex].position.y - 60
-        ballUnderCup.position = CGPoint(x: x, y: y)
+        for i in 1...3 {
+            let imageName = "ghost\(i)"
+            textures.append(SKTexture(imageNamed: imageName))
+        }
         
-        ballUnderCup.fillColor = .green
+        return textures
+    }
+    
+    func createAnimationAction() -> SKAction {
+        let textures = loadSkletonTextures()
         
-        addChild(ballUnderCup)
+        // load the new ghost texture for every 0.15
+        let animationAction = SKAction.animate(with: textures, timePerFrame: 0.15)
+        
+        // make it run forever
+        let forever = SKAction.repeatForever(animationAction)
+        
+        return forever
+    }
+    
+    
+    func addSkletonAboveBox() {
+        
+        // the skeleton will be at either at index 0, or 1, or 2
+        let randomIndex = Int.random(in: 0 ..< boxes.count)
+        
+        // the ball position will be underneath the cup
+        let x = boxes[randomIndex].position.x
+        let y = boxes[randomIndex].position.y + 105
+        
+        skeleton.position = CGPoint(x: x, y: y)
+        skeleton.size = CGSize(width: 150, height: 130)
+        
+        addChild(skeleton)
+        
+        let animationAction = createAnimationAction()
+        skeleton.run(animationAction)
+    }
+    
+    func clean() {
+        for box in boxes {
+            box.removeFromParent()
+        }
+        skeleton.removeFromParent()
+        
+        boxes = []
+        skeleton = SKSpriteNode()
+        
     }
 }
 
-extension CupGameScene {
+extension PandoraGameScene {
     
     override func didMove(to view: SKView) {
-        resetGameDefault()
-        shuffleCups()
+        initalizeGame()
     }
     
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        if !isGameStarted {
-//            print("shuffle")
-//            shuffleCups()
-//            isGameStarted = true
-//        } else {
-////            resetGame()
-////            isGameStarted = false
-//        }
-//    }
-    
-}
-
-extension CupGameScene {
-    
-    func resetGameDefault() {
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-        for cup in cups {
-            cup.removeFromParent()
+        
+        // if game has not started, then start shuffling the cups
+        if !isGameStarted {
+            
+            makeSkeletonDisappear()
+            isGameStarted = true
+            
+        } else { // game has started, then start picking the cup
+            
+            // get the first touch of the user
+            //            guard let touch = touches.first else { return }
+            //
+            //            // get the location of the touch
+            //            let location = touch.location(in: self)
+            //
+            //
+            //            // loop through the cups to see if the location match
+            //
+            //            for (index, box) in boxes.enumerated() {
+            //
+            //                let y_dist = abs(box.position.y - location.y)
+            //                let x_dist = abs(box.position.x - location.x)
+            //
+            //                if x_dist <= 80 && y_dist <= 100 {
+            //                    print("box \(index + 1) is being tapped")
+            //                }
+            //
+            //            }
+            
+            
         }
-        ballUnderCup.removeFromParent()
+    }
     
+}
+
+extension PandoraGameScene {
+    
+    func initalizeGame() {
         backgroundColor = .white
-        setupCups()
-        addBallUnderCup()
+        setupBoxes()
+        addSkletonAboveBox()
+    }
+    
+    func makeSkeletonDisappear() {
+        
+        // create a move action
+        let actionMoveDown = SKAction.moveBy(x: 0, y: -100, duration: 0.5)
+        
+        // create a fade out action so the ghost seems like disappearing
+        let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+        
+        // combine the move and fade out actions
+        let groupAction = SKAction.group([actionMoveDown, actionFadeOut])
+        
+        // remove the skeleton from the scene
+        let removeAction = SKAction.removeFromParent()
+        
+        // combine the move, fadeout, and remove
+        let actions = SKAction.sequence([groupAction, removeAction])
+        
+        skeleton.run(actions, completion: closeBoxes)
         
     }
     
-    func shuffleCups() {
+    func closeBoxes() {
         
-        guard cups.count >= 3 else { return }
+        // remove the open box
+        clean()
         
-        let leftCup = cups[0]
-        let middleCup = cups[1]
-        let rightCup = cups[2]
+        // switch the image from open to close
+        setupBoxes(imageName: "boxClose")
         
-        let middleAction = getMiddleCupAction(cup: middleCup)
-        let leftAction = getLeftCupAction(cup: leftCup)
-        let rightAction = getRightCupAction(cup: rightCup)
-        
-        middleCup.run(middleAction)
-        leftCup.run(leftAction)
-        rightCup.run(rightAction)
     }
     
-    func getMiddleCupAction(cup: SKSpriteNode) -> SKAction {
-        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 1)
-        let wait = SKAction.wait(forDuration: 0.5)
-        let moveUp = SKAction.move(by: CGVectorMake(CGFloat(0), 100), duration: 1)
-        let moveDown = SKAction.move(by: CGVectorMake(0, -100), duration: 1)
-        let sequence = SKAction.sequence([hide, wait, moveUp, moveDown])
+    func shuffleBoxes() {
         
-        return sequence
-    }
-    
-    
-    func getLeftCupAction(cup: SKSpriteNode) -> SKAction {
+        guard boxes.count >= 3 else { return }
         
-        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 1)
+        let leftBox = boxes[0]
+        let middleBox = boxes[1]
+        let rightBox = boxes[2]
         
-        let wait = SKAction.wait(forDuration: 0.5)
+        let nodes = [boxes[0], boxes[1], boxes[2]]
         
-        let path = CGMutablePath()
-        let startPoint = CGPoint(x: cup.position.x,
-                                 y: cup.position.y - 25)
-        let endPoint = CGPoint(x: cup.position.x + 400,
-                               y: cup.position.y - 25)
+        let group = [
+            getLeftCupAction(box: leftBox),
+            getMiddleCupAction(box: middleBox),
+            getRightCupAction(box: rightBox)
+        ]
         
-        let control1 = CGPoint(x: cup.position.x + 200,
-                               y: cup.position.y - 200)
+        var completedAction = 0
+        var totalAction = nodes.count
         
-        let control2 = CGPoint(x: cup.position.x + 400,
-                               y: cup.position.y - 25)
-        
-        path.move(to: startPoint)
-        path.addCurve(to: endPoint, control1: control1, control2: control2)
-        
-        let curve = SKAction.follow(path, asOffset: false, orientToPath: false, duration: 1)
-        
-        let path2 = CGMutablePath()
-        let startPoint2 = CGPoint(x: cup.position.x + 400,
-                                  y: cup.position.y - 25)
-        let endPoint2 = CGPoint(x: cup.position.x,
-                                y: cup.position.y - 25)
-        
-        let control3 = CGPoint(x: cup.position.x + 200,
-                               y: cup.position.y + 200)
-        
-        let control4 = CGPoint(x: cup.position.x,
-                               y: cup.position.y - 25)
-        
-        path2.move(to: startPoint2)
-        path2.addCurve(to: endPoint2, control1: control3, control2: control4)
-        
-        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
+        for (index, node) in nodes.enumerated() {
+            node.run(group[index]) {
                 
-        let sequence = SKAction.sequence([hide, wait, curve, curve2])
-        
-        return sequence
+                completedAction += 1
+                
+                if completedAction == totalAction {
+                    print("done")
+                }
+            }
+        }
         
     }
     
-    func getRightCupAction(cup: SKSpriteNode) -> SKAction {
+    func getMiddleCupAction(box: SKSpriteNode) -> SKAction {
         
-        let hide = SKAction.move(by: CGVectorMake(CGFloat(0), -25), duration: 1)
+        let moveUp = SKAction.moveBy(x: 0, y: 100, duration: 1)
+        let moveDown = SKAction.moveBy(x: 0, y: -100, duration: 1)
+        let sequence = SKAction.sequence([moveUp, moveDown])
+        let repeated_seq = SKAction.repeat(sequence, count: 1)
         
-        let wait = SKAction.wait(forDuration: 0.5)
+        return repeated_seq
+    }
+    
+    
+    func getLeftCupAction(box: SKSpriteNode) -> SKAction {
         
         let path = CGMutablePath()
-        let startPoint = CGPoint(x: cup.position.x,
-                                 y: cup.position.y - 25)
-        let endPoint = CGPoint(x: cup.position.x - 400,
-                               y: cup.position.y - 25)
         
-        let control1 = CGPoint(x: cup.position.x - 200,
-                               y: cup.position.y - 200)
+        let startPoint = CGPoint(x: 300, y: 200)
+        let endPoint = CGPoint(x: 700, y: 200)
         
-        let control2 = CGPoint(x: cup.position.x - 400,
-                               y: cup.position.y - 25)
+        let control1 = CGPoint(x: 500, y: 400)
+        let control2 = CGPoint(x: 700, y: 200)
         
         path.move(to: startPoint)
         path.addCurve(to: endPoint, control1: control1, control2: control2)
@@ -195,44 +250,82 @@ extension CupGameScene {
         let curve = SKAction.follow(path, asOffset: false, orientToPath: false, duration: 1)
         
         let path2 = CGMutablePath()
-        let startPoint2 = CGPoint(x: cup.position.x - 400,
-                                  y: cup.position.y - 25)
-        let endPoint2 = CGPoint(x: cup.position.x,
-                                y: cup.position.y - 25)
+        let startPoint2 = CGPoint(x: 700, y: 200)
+        let endPoint2 = CGPoint(x: 300, y: 200)
         
-        let control3 = CGPoint(x: cup.position.x - 200,
-                               y: cup.position.y + 200)
+        let control3 = CGPoint(x: 500, y: 0)
         
-        let control4 = CGPoint(x: cup.position.x,
-                               y: cup.position.y - 25)
+        // the last control cannot be the exact point as endpoint 2
+        // otherwise it causes endpoint discrepancies
+        let control4 = CGPoint(x: 299, y: 199)
+        
+        path2.move(to: startPoint2)
+        path2.addCurve(to: endPoint2, control1: control3, control2: control4)
+        
+        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 0.5)
+        
+        let sequence = SKAction.sequence([curve, curve2])
+        let repeated_seq = SKAction.repeat(sequence, count: 1)
+        
+        return repeated_seq
+        
+    }
+    
+    func getRightCupAction(box: SKSpriteNode) -> SKAction {
+        
+        let path = CGMutablePath()
+        
+        let startPoint = CGPoint(x: 699, y: 200)
+        let endPoint = CGPoint(x: 300, y: 200)
+        
+        let control1 = CGPoint(x: 500, y: 0)
+        let control2 = CGPoint(x: 300, y: 200)
+        
+        path.move(to: startPoint)
+        path.addCurve(to: endPoint, control1: control1, control2: control2)
+        
+        let curve = SKAction.follow(path, asOffset: false, orientToPath: false, duration: 1)
+        
+        let path2 = CGMutablePath()
+        let startPoint2 = CGPoint(x: 300, y: 200)
+        let endPoint2 = CGPoint(x: 700, y: 200)
+        
+        let control3 = CGPoint(x: 500, y: 420)
+        
+        // the last control cannot be the exact point as endpoint 2
+        // otherwise it causes endpoint discrepancies
+        let control4 = CGPoint(x: 699, y: 199)
         
         path2.move(to: startPoint2)
         path2.addCurve(to: endPoint2, control1: control3, control2: control4)
         
         let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
         
-        let sequence = SKAction.sequence([hide, wait, curve, curve2])
+        let sequence = SKAction.sequence([curve, curve2])
+        let repeated_seq = SKAction.repeat(sequence, count: 1)
         
-        return sequence
+        return repeated_seq
         
     }
 }
 
-struct CupGameSpriteView: View {
+struct PandoraGameSpriteView: View {
     
     @State private var isGameStarted: Bool = false
-        
+    
+    @State private var isAnimating: Bool = false
+    
     var body: some View {
         
         VStack {
             
-            SpriteView(scene: CupGameScene($isGameStarted))
+            SpriteView(scene: PandoraGameScene($isGameStarted, $isAnimating))
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
             
-            Text(isGameStarted ? "Pick one" : "")
-                .fontWeight(.bold)
-                .font(.system(size: 50))
+            Text(isGameStarted ? "Pick one box" : "Tap on screen..")
+                .font(.system(size: 30))
+                .font(.footnote)
             
             Spacer()
         }
@@ -240,5 +333,5 @@ struct CupGameSpriteView: View {
 }
 
 #Preview {
-    CupGameSpriteView()
+    PandoraGameSpriteView()
 }
