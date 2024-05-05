@@ -11,7 +11,7 @@ import SpriteKit
 class PandoraGameScene: SKScene {
     
     private var boxes: [SKSpriteNode] = []
-    private var skeleton = SKShapeNode(circleOfRadius: 15)
+    private var skeleton = SKSpriteNode(imageNamed: "ghost1")
     
     @Binding var isGameStarted: Bool
     
@@ -54,6 +54,30 @@ extension PandoraGameScene {
         
     }
     
+    // load the ghost image from the assets
+    func loadSkletonTextures() -> [SKTexture] {
+        var textures: [SKTexture] = []
+        
+        for i in 1...3 {
+            let imageName = "ghost\(i)"
+            textures.append(SKTexture(imageNamed: imageName))
+        }
+        
+        return textures
+    }
+    
+    func createAnimationAction() -> SKAction {
+        let textures = loadSkletonTextures()
+        
+        // load the new ghost texture for every 0.15
+        let animationAction = SKAction.animate(with: textures, timePerFrame: 0.15)
+        
+        // make it run forever
+        let forever = SKAction.repeatForever(animationAction)
+        
+        return forever
+    }
+    
     
     func addSkletonUnderCup() {
         
@@ -61,13 +85,16 @@ extension PandoraGameScene {
         let randomIndex = Int.random(in: 0 ..< boxes.count)
         
         // the ball position will be underneath the cup
-        let x = boxes[randomIndex].position.x - 4
-        let y = boxes[randomIndex].position.y - 60
+        let x = boxes[randomIndex].position.x
+        let y = boxes[randomIndex].position.y + 105
         
         skeleton.position = CGPoint(x: x, y: y)
-        skeleton.fillColor = .green
+        skeleton.size = CGSize(width: 150, height: 130)
         
         addChild(skeleton)
+        
+        let animationAction = createAnimationAction()
+        skeleton.run(animationAction)
     }
 }
 
