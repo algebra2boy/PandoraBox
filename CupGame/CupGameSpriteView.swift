@@ -13,6 +13,10 @@ class PandoraGameScene: SKScene {
     private var boxes: [SKSpriteNode] = []
     private var skeleton = SKSpriteNode()
     
+    private var skeletonPosition: Int = 1
+    
+    let repeatedCount: Int = 1
+    
     @Binding var isGameStarted: Bool
     
     @Binding var isAnimating: Bool
@@ -46,7 +50,7 @@ extension PandoraGameScene {
         // adding the cup to each position on the scene
         for position in boxPositions {
             let box = SKSpriteNode(imageNamed: imageName)
-            box.size = CGSize(width: 175, height: 140)
+            box.size = CGSize(width: 175, height: 175)
             box.position = position
             addChild(box)
             boxes.append(box)
@@ -82,14 +86,14 @@ extension PandoraGameScene {
     func addSkletonAboveBox() {
         
         // the skeleton will be at either at index 0, or 1, or 2
-        let randomIndex = Int.random(in: 0 ..< boxes.count)
+        skeletonPosition = Int.random(in: 0 ..< boxes.count)
         
         // the ball position will be underneath the cup
-        let x = boxes[randomIndex].position.x
-        let y = boxes[randomIndex].position.y + 105
+        let x = boxes[skeletonPosition].position.x
+        let y = boxes[skeletonPosition].position.y + 120
         
         skeleton.position = CGPoint(x: x, y: y)
-        skeleton.size = CGSize(width: 150, height: 130)
+        skeleton.size = CGSize(width: 150, height: 150)
         
         addChild(skeleton)
         
@@ -127,25 +131,23 @@ extension PandoraGameScene {
         } else { // game has started, then start picking the cup
             
             // get the first touch of the user
-            //            guard let touch = touches.first else { return }
-            //
-            //            // get the location of the touch
-            //            let location = touch.location(in: self)
-            //
-            //
-            //            // loop through the cups to see if the location match
-            //
-            //            for (index, box) in boxes.enumerated() {
-            //
-            //                let y_dist = abs(box.position.y - location.y)
-            //                let x_dist = abs(box.position.x - location.x)
-            //
-            //                if x_dist <= 80 && y_dist <= 100 {
-            //                    print("box \(index + 1) is being tapped")
-            //                }
-            //
-            //            }
+            guard let touch = touches.first else { return }
             
+            // get the location of the touch
+            let location = touch.location(in: self)
+            
+            
+            // loop through the cups to see if the location match
+            for (index, box) in boxes.enumerated() {
+                
+                let y_dist = abs(box.position.y - location.y)
+                let x_dist = abs(box.position.x - location.x)
+                
+                if x_dist <= 80 && y_dist <= 60 {
+                    print("box \(index + 1) is being tapped")
+                }
+                
+            }
             
         }
     }
@@ -177,18 +179,30 @@ extension PandoraGameScene {
         // combine the move, fadeout, and remove
         let actions = SKAction.sequence([groupAction, removeAction])
         
-        skeleton.run(actions, completion: closeBoxes)
+        skeleton.run(actions, completion: playWalkthrough)
         
     }
     
-    func closeBoxes() {
+    func removeBoxesAndSkeleton() {
         
-        // remove the open box
+        // remove the open boxes and skeleton
         clean()
         
         // switch the image from open to close
         setupBoxes(imageName: "boxClose")
         
+    }
+    
+    func playWalkthrough() {
+        removeBoxesAndSkeleton()
+        
+        let wait = SKAction.wait(forDuration: 2)
+        
+        let shuffleAction = SKAction.run(shuffleBoxes)
+        
+        let sequence = SKAction.sequence([wait, shuffleAction])
+        
+        self.run(sequence)
     }
     
     func shuffleBoxes() {
@@ -208,7 +222,7 @@ extension PandoraGameScene {
         ]
         
         var completedAction = 0
-        var totalAction = nodes.count
+        let totalAction = nodes.count
         
         for (index, node) in nodes.enumerated() {
             node.run(group[index]) {
@@ -216,7 +230,9 @@ extension PandoraGameScene {
                 completedAction += 1
                 
                 if completedAction == totalAction {
-                    print("done")
+                    
+                    
+                    
                 }
             }
         }
@@ -228,7 +244,7 @@ extension PandoraGameScene {
         let moveUp = SKAction.moveBy(x: 0, y: 100, duration: 1)
         let moveDown = SKAction.moveBy(x: 0, y: -100, duration: 1)
         let sequence = SKAction.sequence([moveUp, moveDown])
-        let repeated_seq = SKAction.repeat(sequence, count: 1)
+        let repeated_seq = SKAction.repeat(sequence, count: repeatedCount)
         
         return repeated_seq
     }
@@ -251,21 +267,21 @@ extension PandoraGameScene {
         
         let path2 = CGMutablePath()
         let startPoint2 = CGPoint(x: 700, y: 200)
-        let endPoint2 = CGPoint(x: 300, y: 200)
+        let endPoint2 = CGPoint(x: 300, y: 199)
         
         let control3 = CGPoint(x: 500, y: 0)
         
         // the last control cannot be the exact point as endpoint 2
         // otherwise it causes endpoint discrepancies
-        let control4 = CGPoint(x: 299, y: 199)
+        let control4 = CGPoint(x: 301, y: 199)
         
         path2.move(to: startPoint2)
         path2.addCurve(to: endPoint2, control1: control3, control2: control4)
         
-        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 0.5)
+        let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
         
         let sequence = SKAction.sequence([curve, curve2])
-        let repeated_seq = SKAction.repeat(sequence, count: 1)
+        let repeated_seq = SKAction.repeat(sequence, count: repeatedCount)
         
         return repeated_seq
         
@@ -302,7 +318,7 @@ extension PandoraGameScene {
         let curve2 = SKAction.follow(path2, asOffset: false, orientToPath: false, duration: 1)
         
         let sequence = SKAction.sequence([curve, curve2])
-        let repeated_seq = SKAction.repeat(sequence, count: 1)
+        let repeated_seq = SKAction.repeat(sequence, count: repeatedCount)
         
         return repeated_seq
         
