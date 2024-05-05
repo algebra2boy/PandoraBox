@@ -11,7 +11,7 @@ import SpriteKit
 class PandoraGameScene: SKScene {
     
     private var boxes: [SKSpriteNode] = []
-    private var skeleton = SKSpriteNode(imageNamed: "ghost1")
+    private var skeleton = SKSpriteNode()
     
     @Binding var isGameStarted: Bool
     
@@ -35,7 +35,7 @@ class PandoraGameScene: SKScene {
 extension PandoraGameScene {
     
     func setupBoxes() {
-    
+        
         // the cup positions in the x and y coordinate
         let boxPositions = [
             CGPoint(x: 300, y: 200),
@@ -79,7 +79,7 @@ extension PandoraGameScene {
     }
     
     
-    func addSkletonUnderCup() {
+    func addSkletonAboveBox() {
         
         // the skeleton will be at either at index 0, or 1, or 2
         let randomIndex = Int.random(in: 0 ..< boxes.count)
@@ -101,7 +101,7 @@ extension PandoraGameScene {
 extension PandoraGameScene {
     
     override func didMove(to view: SKView) {
-        resetGameDefault()
+        initalizeGame()
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -110,30 +110,30 @@ extension PandoraGameScene {
         // if game has not started, then start shuffling the cups
         if !isGameStarted {
             
-            shuffleBoxes()
+            makeSkeletonDisappear()
             isGameStarted = true
             
         } else { // game has started, then start picking the cup
-                
+            
             // get the first touch of the user
-            guard let touch = touches.first else { return }
-            
-            // get the location of the touch
-            let location = touch.location(in: self)
-            
-
-            // loop through the cups to see if the location match
-            
-            for (index, box) in boxes.enumerated() {
-                
-                let y_dist = abs(box.position.y - location.y)
-                let x_dist = abs(box.position.x - location.x)
-                
-                if x_dist <= 80 && y_dist <= 100 {
-                    print("box \(index + 1) is being tapped")
-                }
-                                
-            }
+            //            guard let touch = touches.first else { return }
+            //
+            //            // get the location of the touch
+            //            let location = touch.location(in: self)
+            //
+            //
+            //            // loop through the cups to see if the location match
+            //
+            //            for (index, box) in boxes.enumerated() {
+            //
+            //                let y_dist = abs(box.position.y - location.y)
+            //                let x_dist = abs(box.position.x - location.x)
+            //
+            //                if x_dist <= 80 && y_dist <= 100 {
+            //                    print("box \(index + 1) is being tapped")
+            //                }
+            //
+            //            }
             
             
         }
@@ -143,16 +143,49 @@ extension PandoraGameScene {
 
 extension PandoraGameScene {
     
-    func resetGameDefault() {
-        
-        for box in boxes {
-            box.removeFromParent()
-        }
-        skeleton.removeFromParent()
-        
+    func initalizeGame() {
         backgroundColor = .white
         setupBoxes()
-        addSkletonUnderCup()
+        addSkletonAboveBox()
+    }
+    
+    //    func resetGameDefault() {
+    //
+    //        for box in boxes {
+    //            box.removeFromParent()
+    //        }d
+    //        skeleton.removeFromParent()
+    //
+    //        backgroundColor = .white
+    //        setupBoxes()
+    //        addSkletonAboveBox()
+    //
+    //    }
+    
+    func makeSkeletonDisappear() {
+        
+        // create a move action
+        let actionMoveDown = SKAction.moveBy(x: 0, y: -100, duration: 0.5)
+        
+        // create a fade out action so the ghost seems like disappearing
+        let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+        
+        // combine the move and fade out actions
+        let groupAction = SKAction.group([actionMoveDown, actionFadeOut])
+        
+        // remove the skeleton from the scene
+        let removeAction = SKAction.removeFromParent()
+        
+        // combine the (move, fade) and remove
+        let actions = SKAction.sequence([groupAction, removeAction])
+        
+        skeleton.run(actions)
+        
+    }
+    
+    func makeBoxClose() {
+        
+        
         
     }
     
@@ -165,7 +198,7 @@ extension PandoraGameScene {
         let rightBox = boxes[2]
         
         let nodes = [boxes[0], boxes[1], boxes[2]]
-                
+        
         let group = [
             getLeftCupAction(box: leftBox),
             getMiddleCupAction(box: middleBox),
