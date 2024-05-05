@@ -15,6 +15,8 @@ class CupGameScene: SKScene {
     
     @Binding var isGameStarted: Bool
     
+    var isAnimating: Bool = false
+    
     
     init(_ isGameStarted: Binding<Bool>) {
         _isGameStarted = isGameStarted
@@ -66,19 +68,19 @@ extension CupGameScene {
     
     override func didMove(to view: SKView) {
         resetGameDefault()
-        shuffleCups()
     }
     
-//    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
-//        if !isGameStarted {
-//            print("shuffle")
-//            shuffleCups()
-//            isGameStarted = true
-//        } else {
-////            resetGame()
-////            isGameStarted = false
-//        }
-//    }
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+//        guard let touch = touches.first else { return }
+        
+        if (!isGameStarted) {
+//            isAnimating = true
+            shuffleCups()
+            isGameStarted = true
+        } else {
+            print("i am here also")
+        }
+    }
     
 }
 
@@ -105,13 +107,32 @@ extension CupGameScene {
         let middleCup = cups[1]
         let rightCup = cups[2]
         
-        let middleAction = getMiddleCupAction(cup: middleCup)
-        let leftAction = getLeftCupAction(cup: leftCup)
-        let rightAction = getRightCupAction(cup: rightCup)
+//        let middleAction = getMiddleCupAction(cup: middleCup)
+//        let leftAction = getLeftCupAction(cup: leftCup)
+//        let rightAction = getRightCupAction(cup: rightCup)
         
-        middleCup.run(middleAction)
-        leftCup.run(leftAction)
-        rightCup.run(rightAction)
+        let nodes = [
+            cups[0],
+            cups[1],
+            cups[2]
+        ]
+        
+//        middleCup.run(middleAction)
+//        leftCup.run(leftAction)
+//        rightCup.run(rightAction)
+        
+        let group = [
+                getLeftCupAction(cup: leftCup),
+                getMiddleCupAction(cup: middleCup),
+                getRightCupAction(cup: rightCup)
+        ]
+        
+        for (index, node) in nodes.enumerated() {
+            node.run(group[index]) {
+                print("hello")
+            }
+        }
+
     }
     
     func getMiddleCupAction(cup: SKSpriteNode) -> SKAction {
@@ -230,9 +251,9 @@ struct CupGameSpriteView: View {
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
             
-            Text(isGameStarted ? "Pick one" : "")
-                .fontWeight(.bold)
+            Text(isGameStarted ? "Pick one cup.." : "Tap on screen..")
                 .font(.system(size: 50))
+                .font(.headline)
             
             Spacer()
         }
