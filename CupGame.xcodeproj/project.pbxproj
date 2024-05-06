@@ -7,21 +7,29 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		675BA8AB2BE97E40007F7828 /* PandoraGame+Movement.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675BA8AA2BE97E40007F7828 /* PandoraGame+Movement.swift */; };
+		675BA8AD2BE97EC3007F7828 /* PandoraGame+Initializer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675BA8AC2BE97EC3007F7828 /* PandoraGame+Initializer.swift */; };
+		675BA8AF2BE97F37007F7828 /* PandoraGame+Override.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675BA8AE2BE97F37007F7828 /* PandoraGame+Override.swift */; };
+		675BA8B12BE97FC4007F7828 /* PandoraGame+Logic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 675BA8B02BE97FC4007F7828 /* PandoraGame+Logic.swift */; };
 		FF68DC6F2BE29BFF0031FD55 /* CupGameApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC6E2BE29BFF0031FD55 /* CupGameApp.swift */; };
 		FF68DC712BE29BFF0031FD55 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC702BE29BFF0031FD55 /* ContentView.swift */; };
 		FF68DC732BE29C060031FD55 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF68DC722BE29C060031FD55 /* Assets.xcassets */; };
 		FF68DC772BE29C060031FD55 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = FF68DC762BE29C060031FD55 /* Preview Assets.xcassets */; };
-		FF68DC802BE2A19C0031FD55 /* CupGameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */; };
+		FF68DC802BE2A19C0031FD55 /* PandoraGameSpriteView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF68DC7F2BE2A19C0031FD55 /* PandoraGameSpriteView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		675BA8AA2BE97E40007F7828 /* PandoraGame+Movement.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PandoraGame+Movement.swift"; sourceTree = "<group>"; };
+		675BA8AC2BE97EC3007F7828 /* PandoraGame+Initializer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PandoraGame+Initializer.swift"; sourceTree = "<group>"; };
+		675BA8AE2BE97F37007F7828 /* PandoraGame+Override.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PandoraGame+Override.swift"; sourceTree = "<group>"; };
+		675BA8B02BE97FC4007F7828 /* PandoraGame+Logic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "PandoraGame+Logic.swift"; sourceTree = "<group>"; };
 		FF68DC6B2BE29BFF0031FD55 /* CupGame.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CupGame.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF68DC6E2BE29BFF0031FD55 /* CupGameApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CupGameApp.swift; sourceTree = "<group>"; };
 		FF68DC702BE29BFF0031FD55 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		FF68DC722BE29C060031FD55 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		FF68DC742BE29C060031FD55 /* CupGame.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CupGame.entitlements; sourceTree = "<group>"; };
 		FF68DC762BE29C060031FD55 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
-		FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CupGameSpriteView.swift; sourceTree = "<group>"; };
+		FF68DC7F2BE2A19C0031FD55 /* PandoraGameSpriteView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PandoraGameSpriteView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,7 +64,11 @@
 			children = (
 				FF68DC6E2BE29BFF0031FD55 /* CupGameApp.swift */,
 				FF68DC702BE29BFF0031FD55 /* ContentView.swift */,
-				FF68DC7F2BE2A19C0031FD55 /* CupGameSpriteView.swift */,
+				FF68DC7F2BE2A19C0031FD55 /* PandoraGameSpriteView.swift */,
+				675BA8AA2BE97E40007F7828 /* PandoraGame+Movement.swift */,
+				675BA8AC2BE97EC3007F7828 /* PandoraGame+Initializer.swift */,
+				675BA8AE2BE97F37007F7828 /* PandoraGame+Override.swift */,
+				675BA8B02BE97FC4007F7828 /* PandoraGame+Logic.swift */,
 				FF68DC722BE29C060031FD55 /* Assets.xcassets */,
 				FF68DC742BE29C060031FD55 /* CupGame.entitlements */,
 				FF68DC752BE29C060031FD55 /* Preview Content */,
@@ -144,7 +156,11 @@
 			files = (
 				FF68DC712BE29BFF0031FD55 /* ContentView.swift in Sources */,
 				FF68DC6F2BE29BFF0031FD55 /* CupGameApp.swift in Sources */,
-				FF68DC802BE2A19C0031FD55 /* CupGameSpriteView.swift in Sources */,
+				675BA8AB2BE97E40007F7828 /* PandoraGame+Movement.swift in Sources */,
+				675BA8AD2BE97EC3007F7828 /* PandoraGame+Initializer.swift in Sources */,
+				FF68DC802BE2A19C0031FD55 /* PandoraGameSpriteView.swift in Sources */,
+				675BA8AF2BE97F37007F7828 /* PandoraGame+Override.swift in Sources */,
+				675BA8B12BE97FC4007F7828 /* PandoraGame+Logic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
