@@ -13,7 +13,7 @@ class PandoraGameScene: SKScene {
     private var boxes: [SKSpriteNode] = []
     private var skeleton = SKSpriteNode()
     
-    private var skeletonPosition: Int = 1
+    private var skeletonPosition: Int = 1 // zero based
     
     let repeatedCount: Int = 1
     
@@ -21,9 +21,15 @@ class PandoraGameScene: SKScene {
     
     @Binding var isAnimating: Bool
     
-    init(_ isGameStarted: Binding<Bool>, _ isAnimating: Binding<Bool>) {
+    @Binding var winCount: Int
+    
+    @Binding var lostCount: Int
+    
+    init(_ isGameStarted: Binding<Bool>, _ isAnimating: Binding<Bool>, _ winCount: Binding<Int>, _ lostCount: Binding<Int>) {
         _isGameStarted = isGameStarted
         _isAnimating = isAnimating
+        _winCount = winCount
+        _lostCount = lostCount
         super.init(size: CGSize(width: 1000, height: 600))
         self.scaleMode = .aspectFit
     }
@@ -31,6 +37,8 @@ class PandoraGameScene: SKScene {
     required init?(coder aDecoder: NSCoder) {
         _isGameStarted = .constant(false)
         _isAnimating = .constant(false)
+        _winCount = .constant(0)
+        _lostCount = .constant(0)
         super.init(coder: aDecoder)
     }
     
@@ -50,7 +58,7 @@ extension PandoraGameScene {
         // adding the cup to each position on the scene
         for position in boxPositions {
             let box = SKSpriteNode(imageNamed: imageName)
-            box.size = CGSize(width: 175, height: 175)
+            box.size = CGSize(width: 200, height: 200)
             box.position = position
             addChild(box)
             boxes.append(box)
@@ -90,7 +98,7 @@ extension PandoraGameScene {
         
         // the ball position will be underneath the cup
         let x = boxes[skeletonPosition].position.x
-        let y = boxes[skeletonPosition].position.y + 120
+        let y = boxes[skeletonPosition].position.y + 130
         
         skeleton.position = CGPoint(x: x, y: y)
         skeleton.size = CGSize(width: 150, height: 150)
@@ -111,6 +119,26 @@ extension PandoraGameScene {
         skeleton = SKSpriteNode()
         
     }
+    
+    
+    func addSkletonInsideBox() {
+        
+        // the skeleton will be at either at index 0, or 1, or 2
+        skeletonPosition = Int.random(in: 0 ..< boxes.count)
+        
+        // the skeleton will be inside the box
+        let x = boxes[skeletonPosition].position.x
+        let y = boxes[skeletonPosition].position.y
+        
+        skeleton.position = CGPoint(x: x, y: y)
+        skeleton.size = CGSize(width: 150, height: 150)
+        
+        addChild(skeleton)
+        
+        let animationAction = createAnimationAction()
+        skeleton.run(animationAction)
+    }
+    
 }
 
 extension PandoraGameScene {
@@ -121,6 +149,11 @@ extension PandoraGameScene {
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
+        // don't allow tapping when it is not done animating
+        if self.isAnimating {
+            return
+        }
+                
         
         // if game has not started, then start shuffling the cups
         if !isGameStarted {
@@ -144,7 +177,7 @@ extension PandoraGameScene {
                 let x_dist = abs(box.position.x - location.x)
                 
                 if x_dist <= 80 && y_dist <= 60 {
-                    print("box \(index + 1) is being tapped")
+                    revealBoxes(index, skeletonPosition)
                 }
                 
             }
@@ -183,6 +216,27 @@ extension PandoraGameScene {
         
     }
     
+    func makeSkeletonAppear() {
+        
+        // create a move action
+        let actionMoveUp = SKAction.moveBy(x: 0, y: 100, duration: 0.5)
+        
+        // create a fade out action so the ghost seems like appearing
+        let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+        
+        // combine the move and fade out actions
+        let groupAction = SKAction.group([actionMoveUp, actionFadeOut])
+        
+        // remove the skeleton from the scene
+        let removeAction = SKAction.removeFromParent()
+        
+        // combine the move, fadeout, and remove
+        let actions = SKAction.sequence([groupAction, removeAction])
+        
+        skeleton.run(actions, completion: playWalkthrough)
+        
+    }
+    
     func removeBoxesAndSkeleton() {
         
         // remove the open boxes and skeleton
@@ -194,6 +248,9 @@ extension PandoraGameScene {
     }
     
     func playWalkthrough() {
+        
+        self.isAnimating = true
+        
         removeBoxesAndSkeleton()
         
         let wait = SKAction.wait(forDuration: 2)
@@ -203,6 +260,35 @@ extension PandoraGameScene {
         let sequence = SKAction.sequence([wait, shuffleAction])
         
         self.run(sequence)
+        
+        skeletonPosition = Int.random(in: 0 ..< boxes.count)
+    }
+    
+    func revealBoxes(_ boxPosition: Int, _ skeletonPosition: Int) {
+        
+        checkWin(boxPosition, skeletonPosition)
+        
+        // remove the open boxes and skeleton
+        clean()
+        
+        // set up open boxes
+        setupBoxes()
+        
+        addSkletonInsideBox()
+        
+        makeSkeletonAppear()
+        
+        
+    }
+    
+    func checkWin(_ boxPosition: Int, _ skeletonPosition: Int) {
+        print("boxPosition \(boxPosition)")
+        print("skeletonPosition \(skeletonPosition)")
+        if (boxPosition == skeletonPosition) {
+            winCount += 1
+        } else {
+            lostCount += 1
+        }
     }
     
     func shuffleBoxes() {
@@ -223,7 +309,7 @@ extension PandoraGameScene {
         
         var completedAction = 0
         let totalAction = nodes.count
-        
+                
         for (index, node) in nodes.enumerated() {
             node.run(group[index]) {
                 
@@ -231,8 +317,7 @@ extension PandoraGameScene {
                 
                 if completedAction == totalAction {
                     
-                    
-                    
+                    self.isAnimating = false
                 }
             }
         }
@@ -331,11 +416,15 @@ struct PandoraGameSpriteView: View {
     
     @State private var isAnimating: Bool = false
     
+    @State private var winCount: Int = 0
+    
+    @State private var lostCont: Int = 0
+    
     var body: some View {
         
-        VStack {
+        VStack(alignment: .center, spacing: 20) {
             
-            SpriteView(scene: PandoraGameScene($isGameStarted, $isAnimating))
+            SpriteView(scene: PandoraGameScene($isGameStarted, $isAnimating, $winCount, $lostCont))
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
             
@@ -343,7 +432,18 @@ struct PandoraGameSpriteView: View {
                 .font(.system(size: 30))
                 .font(.footnote)
             
-            Spacer()
+            VStack {
+                HStack {
+                    Text("# of Win \(winCount)")
+                }
+                
+                HStack {
+                    Text("# of Lost \(lostCont)")
+                }
+            }
+            .font(.system(size: 40))
+            .font(.headline)
+            
         }
     }
 }
