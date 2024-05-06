@@ -280,7 +280,6 @@ extension PandoraGameScene {
         
         checkWin(boxPosition)
         
-        self.isGameStarted = false
     }
     
     func checkWin(_ boxPosition: Int) {
