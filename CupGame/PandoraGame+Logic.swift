@@ -9,18 +9,26 @@ import SpriteKit
 
 extension PandoraGameScene {
     
-    func setupBoxes(imageName: String = "boxOpen") {
+    enum BoxImageName: String {
+        case boxOpen = "boxOpen"
+        case boxClose = "boxClose"
+    }
+    
+    /// Sets the boxes with `SKSpriteNode`
+    /// - Parameters:
+    ///   - imageName: The image name of the box, either "boxOpen" or "boxClose"
+    func setupBoxes(imageName: BoxImageName) {
         
-        // the cup positions in the x and y coordinate
+        // the box positions in the x and y coordinate
         let boxPositions = [
             CGPoint(x: 300, y: 200),
             CGPoint(x: 500, y: 200),
             CGPoint(x: 700, y: 200)
         ]
         
-        // adding the cup to each position on the scene
+        // adding the box to each position on the scene
         for position in boxPositions {
-            let box = SKSpriteNode(imageNamed: imageName)
+            let box = SKSpriteNode(imageNamed: imageName.rawValue)
             box.size = CGSize(width: 200, height: 200)
             box.position = position
             addChild(box)
@@ -29,50 +37,7 @@ extension PandoraGameScene {
         
     }
     
-    // load the ghost image from the assets
-    func loadSkletonTextures() -> [SKTexture] {
-        var textures: [SKTexture] = []
-        
-        for i in 1...3 {
-            let imageName = "ghost\(i)"
-            textures.append(SKTexture(imageNamed: imageName))
-        }
-        
-        return textures
-    }
-    
-    func createAnimationAction() -> SKAction {
-        let textures = loadSkletonTextures()
-        
-        // load the new ghost texture for every 0.15
-        let animationAction = SKAction.animate(with: textures, timePerFrame: 0.15)
-        
-        // make it run forever
-        let forever = SKAction.repeatForever(animationAction)
-        
-        return forever
-    }
-    
-    
-    func addSkletonAboveBox() {
-        
-        // the skeleton will be at either at index 0, or 1, or 2
-        skeletonPosition = Int.random(in: 0 ..< boxes.count)
-        
-        // the ball position will be underneath the cup
-        let x = boxes[skeletonPosition].position.x
-        let y = boxes[skeletonPosition].position.y + 130
-        
-        skeleton.position = CGPoint(x: x, y: y)
-        skeleton.size = CGSize(width: 150, height: 150)
-        
-        addChild(skeleton)
-        
-        let animationAction = createAnimationAction()
-        skeleton.run(animationAction)
-    }
-    
-    func clean() {
+    func removeBoxesAndSkeleton() {
         for box in boxes {
             box.removeFromParent()
         }
@@ -83,15 +48,58 @@ extension PandoraGameScene {
         
     }
     
+}
+
+// Handles rendering skeleton
+extension PandoraGameScene {
     
-    func addSkletonInsideBox() {
+    enum SkeletonPlacement {
+        case aboveBox
+        case insideBox
+    }
+    
+    /// load texture for the skeleton for render
+    /// - Returns: An array of `SKTexture`
+    func loadSkeletonTexture() -> [SKTexture] {
+        var textures: [SKTexture] = []
+        
+        for i in 1...3 {
+            let imageName = "ghost\(i)"
+            textures.append(SKTexture(imageNamed: imageName))
+        }
+        
+        return textures
+    }
+    
+    /// generate action for the skeleton texture to run forever
+    /// - Returns: A `SKAction`
+    func createAnimationAction() -> SKAction {
+        let textures = loadSkeletonTexture()
+        
+        // animate the new ghost texture for every 0.15
+        let animationAction = SKAction.animate(with: textures, timePerFrame: 0.15)
+        
+        // make it run forever
+        let foreverAction = SKAction.repeatForever(animationAction)
+        
+        return foreverAction
+    }
+    
+    /// Add skeleton either above the box or inside the box
+    /// - Parameters:
+    ///   - placement: The placement of skeleton, either `aboveBox` or `insideBox`
+    func addSkeleton(at placement: SkeletonPlacement) {
         
         // the skeleton will be at either at index 0, or 1, or 2
         skeletonPosition = Int.random(in: 0 ..< boxes.count)
         
-        // the skeleton will be inside the box
         let x = boxes[skeletonPosition].position.x
-        let y = boxes[skeletonPosition].position.y
+        var y = boxes[skeletonPosition].position.y
+        
+        switch placement {
+        case .aboveBox: y += 130
+        case .insideBox: y += 0
+        }
         
         skeleton.position = CGPoint(x: x, y: y)
         skeleton.size = CGSize(width: 150, height: 150)
@@ -100,63 +108,71 @@ extension PandoraGameScene {
         
         let animationAction = createAnimationAction()
         skeleton.run(animationAction)
+        
     }
-    
 }
 
 
 extension PandoraGameScene {
     
-    func initalizeGame() {
-        backgroundColor = .white
-        setupBoxes()
-        addSkletonAboveBox()
-    }
+    func setupBackground() {
         
-    func removeBoxesAndSkeleton() {
+        let background = SKSpriteNode(imageNamed: "background")
         
-        // remove the open boxes and skeleton
-        clean()
+        // position the background in the middle of the scene
+        background.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
         
-        // switch the image from open to close
-        setupBoxes(imageName: "boxClose")
+        // set the size of the background to fill the entire scene
+        background.size = self.size
+        
+        // stay behind all the nodes
+        background.zPosition = -1
+
+        addChild(background)
         
     }
     
+    func initalizeGame() {
+        setupBackground()
+        setupBoxes(imageName: .boxOpen)
+        addSkeleton(at: .aboveBox)
+    }
+        
     func playWalkthrough() {
         
         removeBoxesAndSkeleton()
         
-        let wait = SKAction.wait(forDuration: 2)
+        setupBoxes(imageName: .boxClose)
+        
+        let waitAction = SKAction.wait(forDuration: 2)
         
         let shuffleAction = SKAction.run(shuffleBoxes)
         
-        let sequence = SKAction.sequence([wait, shuffleAction])
+        let sequence = SKAction.sequence([waitAction, shuffleAction])
         
         self.run(sequence)
         
+        // re-generate for a new game
         skeletonPosition = Int.random(in: 0 ..< boxes.count)
         repeatedCount = Int.random(in: 1...3)
         timeToShuffle = TimeInterval(Float.random(in: 0.3...0.8))
     }
     
-    func revealBoxes(_ boxPosition: Int) {
+    func revealBoxes(at boxPosition: Int) {
         
-        // remove the open boxes and skeleton
-        clean()
+        removeBoxesAndSkeleton()
         
-        // set up open boxes
-        setupBoxes()
+        setupBoxes(imageName: .boxOpen)
         
-        addSkletonInsideBox()
+        addSkeleton(at: .insideBox)
         
-        makeSkeletonAppear()
+        moveSkeleton(.up)
         
-        checkWin(boxPosition)
+        checkWin(with: boxPosition)
         
     }
     
-    func checkWin(_ boxPosition: Int) {
+    func checkWin(with boxPosition: Int) {
         
         if (boxPosition == self.skeletonPosition) {
             lostCount += 1
@@ -169,28 +185,24 @@ extension PandoraGameScene {
         
         guard boxes.count >= 3 else { return }
         
-        let leftBox = boxes[0]
-        let middleBox = boxes[1]
-        let rightBox = boxes[2]
-        
         let nodes = [boxes[0], boxes[1], boxes[2]]
         
         let group = [
-            getLeftBoxAction(box: leftBox),
-            getMiddleBoxAction(box: middleBox),
-            getRightBoxAction(box: rightBox)
+            getLeftBoxAction(),
+            getMiddleBoxAction(),
+            getRightBoxAction()
         ]
         
         var completedAction = 0
         let totalAction = nodes.count
         
+        // loop over each action and run each action using corresponding node
         for (index, node) in nodes.enumerated() {
             node.run(group[index]) {
                 
                 completedAction += 1
                 
                 if completedAction == totalAction {
-                    
                     self.isAnimating = false
                 }
             }
