@@ -157,7 +157,7 @@ extension PandoraGameScene {
         
         // if game has not started, then start shuffling the cups
         if !isGameStarted {
-            
+            isAnimating = true
             makeSkeletonDisappear()
             isGameStarted = true
             
@@ -178,6 +178,9 @@ extension PandoraGameScene {
                 
                 if x_dist <= 80 && y_dist <= 60 {
                     revealBoxes(index, skeletonPosition)
+//                    print("box index is \(index)")
+//                    print("skeleton index is \(skeletonPosition)")
+//                    print("hello")
                 }
                 
             }
@@ -201,7 +204,7 @@ extension PandoraGameScene {
         let actionMoveDown = SKAction.moveBy(x: 0, y: -100, duration: 0.5)
         
         // create a fade out action so the ghost seems like disappearing
-        let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+        let actionFadeOut = SKAction.fadeOut(withDuration: 2)
         
         // combine the move and fade out actions
         let groupAction = SKAction.group([actionMoveDown, actionFadeOut])
@@ -222,7 +225,7 @@ extension PandoraGameScene {
         let actionMoveUp = SKAction.moveBy(x: 0, y: 100, duration: 0.5)
         
         // create a fade out action so the ghost seems like appearing
-        let actionFadeOut = SKAction.fadeOut(withDuration: 1)
+        let actionFadeOut = SKAction.fadeOut(withDuration: 2)
         
         // combine the move and fade out actions
         let groupAction = SKAction.group([actionMoveUp, actionFadeOut])
@@ -248,9 +251,7 @@ extension PandoraGameScene {
     }
     
     func playWalkthrough() {
-        
-        self.isAnimating = true
-        
+                
         removeBoxesAndSkeleton()
         
         let wait = SKAction.wait(forDuration: 2)
@@ -261,7 +262,7 @@ extension PandoraGameScene {
         
         self.run(sequence)
         
-        skeletonPosition = Int.random(in: 0 ..< boxes.count)
+//        skeletonPosition = Int.random(in: 0 ..< boxes.count)
     }
     
     func revealBoxes(_ boxPosition: Int, _ skeletonPosition: Int) {
@@ -282,12 +283,14 @@ extension PandoraGameScene {
     }
     
     func checkWin(_ boxPosition: Int, _ skeletonPosition: Int) {
-        print("boxPosition \(boxPosition)")
-        print("skeletonPosition \(skeletonPosition)")
+        
+        print("box index is \(boxPosition)")
+        print("skeleton index is \(skeletonPosition)")
+        
         if (boxPosition == skeletonPosition) {
-            winCount += 1
-        } else {
             lostCount += 1
+        } else {
+            winCount += 1
         }
     }
     
@@ -434,11 +437,11 @@ struct PandoraGameSpriteView: View {
             
             VStack {
                 HStack {
-                    Text("# of Win \(winCount)")
+                    Text("# of Win: \(winCount)")
                 }
                 
                 HStack {
-                    Text("# of Lost \(lostCont)")
+                    Text("# of Lost: \(lostCont)")
                 }
             }
             .font(.system(size: 40))
