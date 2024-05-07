@@ -14,33 +14,16 @@ struct PandoraGameSpriteView: View {
     
     @State private var isAnimating: Bool = false
     
-    @State private var winCount: Int = 0
+    @State private var isSkeletonPicked = false
     
-    @State private var lostCont: Int = 0
     
     var body: some View {
         
         VStack(alignment: .center, spacing: 20) {
-            
-            SpriteView(scene: PandoraGameScene($isGameStarted, $isAnimating, $winCount, $lostCont))
+                        
+            SpriteView(scene: PandoraGameScene($isGameStarted, $isAnimating, $isSkeletonPicked))
                 .frame(width: 1000, height: 600)
                 .ignoresSafeArea()
-            
-            Text(isGameStarted ? "Pick one box" : "Tap on screen..")
-                .font(.system(size: 30))
-                .font(.footnote)
-            
-            VStack {
-                HStack {
-                    Text("# of Win: \(winCount)")
-                }
-                
-                HStack {
-                    Text("# of Lost: \(lostCont)")
-                }
-            }
-            .font(.system(size: 40))
-            .font(.headline)
             
         }
     }

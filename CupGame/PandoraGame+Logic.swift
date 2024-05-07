@@ -14,6 +14,23 @@ extension PandoraGameScene {
         case boxClose = "boxClose"
     }
     
+    func setupBackground() {
+        
+        let background = SKSpriteNode(imageNamed: "background")
+        
+        // position the background in the middle of the scene
+        background.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
+        
+        // set the size of the background to fill the entire scene
+        background.size = self.size
+        
+        // stay behind all the nodes
+        background.zPosition = -1
+        
+        addChild(background)
+        
+    }
+    
     /// Sets the boxes with `SKSpriteNode`
     /// - Parameters:
     ///   - imageName: The image name of the box, either "boxOpen" or "boxClose"
@@ -35,6 +52,27 @@ extension PandoraGameScene {
             boxes.append(box)
         }
         
+    }
+    
+    func addDontPickDeath() {
+        
+        let warning = SKSpriteNode(imageNamed: "warning")
+        
+        warning.position = CGPoint(
+            x: boxes[1].position.x,
+            y: boxes[1].position.y - 140
+        )
+        warning.size = CGSize(width: 500, height: 300)
+        
+        addChild(warning)
+        
+    }
+        
+    func initalizeGame() {
+        setupBackground()
+        setupBoxes(imageName: .boxOpen)
+        addSkeleton(at: .aboveBox)
+        addDontPickDeath()
     }
     
     func removeBoxesAndSkeleton() {
@@ -115,42 +153,25 @@ extension PandoraGameScene {
 
 extension PandoraGameScene {
     
-    func setupBackground() {
-        
-        let background = SKSpriteNode(imageNamed: "background")
-        
-        // position the background in the middle of the scene
-        background.position = CGPoint(x: self.size.width / 2, y: self.size.height / 2)
-        
-        // set the size of the background to fill the entire scene
-        background.size = self.size
-        
-        // stay behind all the nodes
-        background.zPosition = -1
-
-        addChild(background)
-        
-    }
-    
-    func initalizeGame() {
-        setupBackground()
-        setupBoxes(imageName: .boxOpen)
-        addSkeleton(at: .aboveBox)
-    }
-        
     func playWalkthrough() {
         
-        self.isAnimating = true
+        let animatingAction = SKAction.run { self.isAnimating = true }
         
-        removeBoxesAndSkeleton()
+        let removeAction = SKAction.run(self.removeBoxesAndSkeleton)
         
-        setupBoxes(imageName: .boxClose)
+        let setupAction = SKAction.run { self.setupBoxes(imageName: .boxClose) }
         
         let waitAction = SKAction.wait(forDuration: 2)
         
         let shuffleAction = SKAction.run(shuffleBoxes)
         
-        let sequence = SKAction.sequence([waitAction, shuffleAction])
+        let sequence = SKAction.sequence([
+            animatingAction,
+            removeAction,
+            setupAction,
+            waitAction,
+            shuffleAction
+        ])
         
         self.run(sequence)
         
@@ -173,21 +194,48 @@ extension PandoraGameScene {
         
         let moveSkeletonAction = SKAction.run { self.moveSkeleton(.up) }
         
-        let sequence = SKAction.sequence([animatingAction, removeAction, setupAction, addSkeletonAction, moveSkeletonAction])
+        let checkWinAction = SKAction.run { self.checkWin(with: boxPosition) }
+        
+        let sequence = SKAction.sequence([
+            animatingAction,
+            removeAction,
+            setupAction,
+            addSkeletonAction,
+            moveSkeletonAction,
+            checkWinAction
+        ])
         
         self.run(sequence)
-        
-        checkWin(with: boxPosition)
         
     }
     
     func checkWin(with boxPosition: Int) {
-        
         if (boxPosition == self.skeletonPosition) {
-            lostCount += 1
-        } else {
-            winCount += 1
+            self.isSkeletonPicked = true
+            displayDefeat()
         }
+    }
+    
+    func displayDefeat() {
+        
+        let defeat = SKSpriteNode(imageNamed: "defeat")
+        
+        defeat.position = CGPoint(
+            x: boxes[1].position.x,
+            y: boxes[1].position.y
+        )
+        defeat.size = CGSize(width: 500, height: 500)
+        
+        let add = SKAction.run { self.addChild(defeat) }
+        
+        let wait = SKAction.wait(forDuration: 2)
+        
+        let remove = SKAction.run { defeat.removeFromParent() }
+        
+        let seq = SKAction.sequence([add, wait, remove])
+        
+        self.run(seq)
+        
     }
     
     func shuffleBoxes() {

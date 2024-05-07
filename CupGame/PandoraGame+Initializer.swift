@@ -23,15 +23,12 @@ class PandoraGameScene: SKScene {
     
     @Binding var isAnimating: Bool
     
-    @Binding var winCount: Int
-    
-    @Binding var lostCount: Int
-    
-    init(_ isGameStarted: Binding<Bool>, _ isAnimating: Binding<Bool>, _ winCount: Binding<Int>, _ lostCount: Binding<Int>) {
+    @Binding var isSkeletonPicked: Bool
+        
+    init(_ isGameStarted: Binding<Bool>, _ isAnimating: Binding<Bool>, _ isSkeletonPicked: Binding<Bool> ) {
         _isGameStarted = isGameStarted
         _isAnimating = isAnimating
-        _winCount = winCount
-        _lostCount = lostCount
+        _isSkeletonPicked = isSkeletonPicked
         super.init(size: CGSize(width: 1000, height: 600))
         self.scaleMode = .aspectFit
     }
@@ -39,8 +36,7 @@ class PandoraGameScene: SKScene {
     required init?(coder aDecoder: NSCoder) {
         _isGameStarted = .constant(false)
         _isAnimating = .constant(false)
-        _winCount = .constant(0)
-        _lostCount = .constant(0)
+        _isSkeletonPicked = .constant(false)
         super.init(coder: aDecoder)
     }
     
