@@ -140,6 +140,8 @@ extension PandoraGameScene {
         
     func playWalkthrough() {
         
+        self.isAnimating = true
+        
         removeBoxesAndSkeleton()
         
         setupBoxes(imageName: .boxClose)
@@ -160,13 +162,20 @@ extension PandoraGameScene {
     
     func revealBoxes(at boxPosition: Int) {
         
-        removeBoxesAndSkeleton()
+        // These functions needed to be run using SKAction because they involve manipulating SpriteNode
+        let animatingAction = SKAction.run { self.isAnimating = true }
         
-        setupBoxes(imageName: .boxOpen)
+        let removeAction = SKAction.run(self.removeBoxesAndSkeleton)
         
-        addSkeleton(at: .insideBox)
+        let setupAction = SKAction.run { self.setupBoxes(imageName: .boxOpen) }
         
-        moveSkeleton(.up)
+        let addSkeletonAction = SKAction.run { self.addSkeleton(at: .insideBox) }
+        
+        let moveSkeletonAction = SKAction.run { self.moveSkeleton(.up) }
+        
+        let sequence = SKAction.sequence([animatingAction, removeAction, setupAction, addSkeletonAction, moveSkeletonAction])
+        
+        self.run(sequence)
         
         checkWin(with: boxPosition)
         

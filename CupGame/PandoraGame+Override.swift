@@ -19,7 +19,7 @@ extension PandoraGameScene {
         if self.isAnimating {
             return
         }
-        
+                
         // if game has not started, then start shuffling the boxes
         if !isGameStarted {
             isAnimating = true
