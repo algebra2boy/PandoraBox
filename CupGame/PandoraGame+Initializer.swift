@@ -15,9 +15,9 @@ class PandoraGameScene: SKScene {
     
     var skeletonPosition: Int = 1 // zero based
     
-    var repeatedCount: Int = Int.random(in: 1...3)
+    var repeatedCount: Int = Int.random(in: 1...4)
     
-    var timeToShuffle: TimeInterval = TimeInterval(Float.random(in: 0.3...0.8))
+    var timeToShuffle: TimeInterval = TimeInterval(Float.random(in: 0.5...1.2))
     
     @Binding var isGameStarted: Bool
     

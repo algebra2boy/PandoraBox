@@ -21,9 +21,9 @@ extension PandoraGameScene {
         
         // the box positions in the x and y coordinate
         let boxPositions = [
-            CGPoint(x: 300, y: 200),
-            CGPoint(x: 500, y: 200),
-            CGPoint(x: 700, y: 200)
+            CGPoint(x: 300, y: 300),
+            CGPoint(x: 500, y: 300),
+            CGPoint(x: 700, y: 300)
         ]
         
         // adding the box to each position on the scene
